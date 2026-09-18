@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.Kashish.secure_order_api.entity.Customer;
 import com.Kashish.secure_order_api.service.CustomerService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/customers")
 public class CustomerController 
@@ -26,7 +28,7 @@ public class CustomerController
 	}
 	
 	@PostMapping
-	public Customer createCustomer(@RequestBody Customer customer)
+	public Customer createCustomer(@Valid @RequestBody Customer customer)
 	{
 		return customerService.createCustomer(customer);
 	}

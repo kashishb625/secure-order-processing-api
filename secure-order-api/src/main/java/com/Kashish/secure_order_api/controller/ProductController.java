@@ -1,6 +1,7 @@
 package com.Kashish.secure_order_api.controller;
 
 import java.util.List;
+import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.Kashish.secure_order_api.entity.Product;
 import com.Kashish.secure_order_api.service.ProductService;
 
+
 @RestController
 @RequestMapping("/api/products")
 public class ProductController 
@@ -26,7 +28,7 @@ public class ProductController
 	}
 	
 	@PostMapping
-	public Product createProduct(@RequestBody Product product)
+	public Product createProduct(@Valid @RequestBody Product product)
 	{
 		return productService.createProduct(product);
 		

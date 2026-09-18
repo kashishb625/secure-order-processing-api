@@ -4,15 +4,19 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
 @Entity
 public class Customer 
 {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
+	@NotBlank(message="Customer name is required.")
 	private String name;
+	@Email(message="Please enter a valid email.")
 	private String email;
+	@NotBlank(message="Enter phone number")
 	private String phone;
 	
 	public Long getId()

@@ -1,5 +1,6 @@
 package com.Kashish.secure_order_api.entity;
 
+import jakarta.validation.constraints.*;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,9 +12,12 @@ public class Product
 	@Id
 	@GeneratedValue(strategy =GenerationType.IDENTITY)
 	private Long id;
+	@NotBlank(message="Product name is required.")
 	private String p_name;
 	private String p_description;
+	@Min(value=0,message="Price cannot be negative.")
 	private double price;
+	@Min(value=0,message="Stock quantity cannot be negative.")
 	private int stock_Quantity;
 	
 	

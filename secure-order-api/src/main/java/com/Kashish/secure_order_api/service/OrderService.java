@@ -1,11 +1,13 @@
 package com.Kashish.secure_order_api.service;
 
 import java.time.LocalDateTime;
+
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.Kashish.secure_order_api.entity.Order;
+import com.Kashish.secure_order_api.exception.ResourceNotFoundException;
 import com.Kashish.secure_order_api.repository.OrderRepository;
 
 @Service
@@ -32,7 +34,7 @@ public class OrderService
 	
 	public Order getOrderById(Long id)
 	{
-		return orderRepository.findById(id).orElse(null);
+		return orderRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Order not found with the order id: "+id));
 	}
 	
 	public Order updateOrder(Long id,Order updatedOrder)

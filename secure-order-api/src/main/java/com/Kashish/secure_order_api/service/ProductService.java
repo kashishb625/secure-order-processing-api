@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.Kashish.secure_order_api.entity.Product;
+import com.Kashish.secure_order_api.exception.ResourceNotFoundException;
 import com.Kashish.secure_order_api.repository.ProductRepository;
 
 @Service
@@ -31,7 +32,7 @@ public class ProductService
 	
 	public Product getProductById(Long id)
 	{
-		return productRepository.findById(id).orElse(null);
+		return productRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Product not found with id: "+id));
 	}
 	
 	public Product updateProduct(Long id,Product updatedProduct)

@@ -35,12 +35,7 @@ public class CustomerService
 	
 	public Customer updateCustomer(Long id,Customer updatedCustomer)
 	{
-		Customer existingCustomer=customerRepository.findById(id).orElse(null);
-		
-		if(existingCustomer==null)
-		{
-			return null;
-		}
+		Customer existingCustomer=customerRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Customer not found with id: "+id));
 		
 		existingCustomer.setName(updatedCustomer.getName());
 		existingCustomer.setEmail(updatedCustomer.getEmail());
@@ -51,7 +46,8 @@ public class CustomerService
 	
 	public void deleteCustomer(Long id)
 	{
-		customerRepository.deleteById(id);
+		Customer customer=customerRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Customer not found with id: "+id));
+		customerRepository.delete(customer);
 	}
 
 }

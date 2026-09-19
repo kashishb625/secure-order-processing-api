@@ -37,12 +37,7 @@ public class ProductService
 	
 	public Product updateProduct(Long id,Product updatedProduct)
 	{
-		Product existingProduct= productRepository.findById(id).orElse(null);
-		
-		if(existingProduct==null)
-		{
-			return null;
-		}
+		Product existingProduct= productRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Product not found with id: "+id));
 		
 		existingProduct.setP_name(updatedProduct.getP_name());
 		existingProduct.setP_description(updatedProduct.getP_description());
@@ -54,6 +49,7 @@ public class ProductService
 	
 	public void deleteProduct(Long id)
 	{
-		productRepository.deleteById(id);
+		Product product=productRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Product not found with id: "+id));
+		productRepository.delete(product);
 	}
 }

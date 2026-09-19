@@ -39,11 +39,7 @@ public class OrderService
 	
 	public Order updateOrder(Long id,Order updatedOrder)
 	{
-		Order existingOrder=orderRepository.findById(id).orElse(null);
-		if(existingOrder==null)
-		{
-			return null;
-		}
+		Order existingOrder=orderRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Order not found with id: "+id));;
 		
 		existingOrder.setCustomer(updatedOrder.getCustomer());
 		existingOrder.setTotalAmount(updatedOrder.getTotalAmount());
@@ -54,7 +50,8 @@ public class OrderService
 	
 	public void deleteOrder(Long id)
 	{
-		orderRepository.deleteById(id);
+		Order order=orderRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Order not found with id: "+id));
+		orderRepository.delete(order);
 		
 	}
 	

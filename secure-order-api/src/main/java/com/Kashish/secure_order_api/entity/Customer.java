@@ -16,7 +16,7 @@ public class Customer
 	private String name;
 	@Email(message="Please enter a valid email.")
 	private String email;
-	@NotBlank(message="Enter phone number")
+	@NotBlank(message="Phone number is required")
 	private String phone;
 	
 	public Long getId()

@@ -22,5 +22,11 @@ public class GlobalExceptionHandler
 		String message=ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
 		return new ResponseEntity<>(message,HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(InvalidCredentialsException.class)
+	public ResponseEntity<String> handleInvalidCredentials(InvalidCredentialsException ex)
+	{
+		return new ResponseEntity<>(ex.getMessage(),HttpStatus.UNAUTHORIZED);
+	}
 
 }

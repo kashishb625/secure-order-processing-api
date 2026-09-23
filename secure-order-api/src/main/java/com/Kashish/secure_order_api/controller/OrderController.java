@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.Kashish.secure_order_api.dto.OrderResponse;
 import com.Kashish.secure_order_api.entity.Order;
 import com.Kashish.secure_order_api.service.OrderService;
 
@@ -29,27 +30,54 @@ public class OrderController
 	}
 	
 	@PostMapping
-	public Order createOrder(@Valid @RequestBody Order order)
+	public OrderResponse createOrder(@Valid @RequestBody Order order)
 	{
-		return orderService.createOrder(order);
+		Order createdOrder= orderService.createOrder(order);
+		return convertToResponse(createdOrder);
 	}
 	
-	@GetMapping
-	public List<Order> getAllOrders()
+	public OrderResponse convertToResponse(Order order)
 	{
-		return orderService.getAllOrders();
+		OrderResponse response=new OrderResponse();
+		
+		response.setId(order.getId());
+		response.setTotalAmount(order.getTotalAmount());
+		response.setStatus(order.getStatus());
+		response.setOrderDate(order.getOrderDate());
+		
+		if(order.getCustomer()!=null)
+		{
+			response.setCustomerName(order.getCustomer().getName());
+			response.setCustomerId(order.getCustomer().getId());
+			
+			if(order.getCustomer().getUser()!=null)
+			{
+				response.setUsername(order.getCustomer().getUser().getUsername());
+			}
+		}
+		return response;
+	}
+	
+	
+	@GetMapping
+	public List<OrderResponse> getAllOrders()
+	{
+		return orderService.getAllOrders().stream()
+				.map(this::convertToResponse).toList();
 	}
 	
 	@GetMapping("/{id}")
-	public Order getOrderbyId(@PathVariable Long id)
+	public OrderResponse getOrderbyId(@PathVariable Long id)
 	{
-		return orderService.getOrderById(id);
+		Order order= orderService.getOrderById(id);
+		return convertToResponse(order);
 	}
 	
 	@PutMapping("/{id}")
-	public Order updateOrder(@PathVariable Long id,@Valid @RequestBody Order order)
+	public OrderResponse updateOrder(@PathVariable Long id,@Valid @RequestBody Order order)
 	{
-		return orderService.updateOrder(id, order);
+		Order updatedOrder=orderService.updateOrder(id, order);
+		return convertToResponse(updatedOrder);
 	}
 	
 	@DeleteMapping("/{id}")

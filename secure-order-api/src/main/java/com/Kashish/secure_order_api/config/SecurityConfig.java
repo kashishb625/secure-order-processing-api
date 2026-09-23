@@ -13,6 +13,8 @@ import com.Kashish.secure_order_api.security.JwtAuthenticationfilter;
 import com.Kashish.secure_order_api.service.JwtService;
 import com.Kashish.secure_order_api.service.UserService;
 
+import jakarta.servlet.DispatcherType;
+
 @Configuration
 public class SecurityConfig {
 
@@ -32,6 +34,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                 .requestMatchers("/api/users/**")
                 .hasRole("ADMIN")
                 .requestMatchers(

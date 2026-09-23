@@ -1,9 +1,12 @@
 package com.Kashish.secure_order_api.entity;
 
 import jakarta.persistence.Entity;
+
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Email;
 @Entity
@@ -18,6 +21,10 @@ public class Customer
 	private String email;
 	@NotBlank(message="Phone number is required")
 	private String phone;
+	
+	@OneToOne
+	@JoinColumn(name="user_id",unique=true)
+	private User user;
 	
 	public Long getId()
 	{
@@ -57,6 +64,14 @@ public class Customer
 	public void setPhone(String phone)
 	{
 		this.phone = phone;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 	
 	

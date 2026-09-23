@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.Kashish.secure_order_api.dto.CustomerResponse;
 import com.Kashish.secure_order_api.entity.Customer;
 import com.Kashish.secure_order_api.service.CustomerService;
 
@@ -28,27 +29,50 @@ public class CustomerController
 	}
 	
 	@PostMapping
-	public Customer createCustomer(@Valid @RequestBody Customer customer)
+	public CustomerResponse createCustomer(@Valid @RequestBody Customer customer)
 	{
-		return customerService.createCustomer(customer);
+		Customer createdCustomer=customerService.createCustomer(customer);
+		return convertToResponse(createdCustomer);
 	}
 	
-	@GetMapping
-	public List<Customer> getAllCustomers()
+	private CustomerResponse convertToResponse(Customer customer)
 	{
-		return customerService.getAllCustomers();
+		CustomerResponse response=new CustomerResponse();
+		
+		response.setId(customer.getId());
+		response.setName(customer.getName());
+		response.setEmail(customer.getEmail());
+		response.setPhone(customer.getPhone());
+		
+		if(customer.getUser()!=null)
+		{
+			response.setUserId(customer.getUser().getId());
+			response.setUsername(customer.getUser().getUsername());
+		}
+		return response;
+	}
+	
+	
+	@GetMapping
+	public List<CustomerResponse> getAllCustomers()
+	{
+		return customerService.getAllCustomers()
+				.stream()
+				.map(customer -> convertToResponse(customer)).toList();
 	}
 	
 	@GetMapping("/{id}")
-	public Customer getById(@PathVariable Long id)
+	public CustomerResponse getById(@PathVariable Long id)
 	{
-		return customerService.getById(id);
+		Customer customer=customerService.getById(id);
+		return convertToResponse(customer);
 	}
 	
 	@PutMapping("/{id}")
-	public Customer updateCustomer(@PathVariable Long id,@Valid @RequestBody Customer customer)
+	public CustomerResponse updateCustomer(@PathVariable Long id,@Valid @RequestBody Customer customer)
 	{
-		return customerService.updateCustomer(id, customer);
+		Customer updatedCustomer=customerService.updateCustomer(id, customer);
+		return convertToResponse(updatedCustomer);
 	}
 	
 	@DeleteMapping("/{id}")

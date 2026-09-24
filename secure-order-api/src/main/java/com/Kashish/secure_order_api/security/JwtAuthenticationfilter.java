@@ -2,9 +2,9 @@ package com.Kashish.secure_order_api.security;
 
 import java.io.IOException;
 
-import org.springframework.boot.webmvc.autoconfigure.WebMvcProperties.Apiversion.Use;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -29,13 +29,12 @@ public class JwtAuthenticationfilter extends OncePerRequestFilter
 		this.userService=userService;
 	}
 
-
-
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException 
 	{
 		String authHeader=request.getHeader("Authorization");
+			
 		if(authHeader !=null && authHeader.startsWith("Bearer "))
 		{
 			try {
@@ -50,14 +49,22 @@ public class JwtAuthenticationfilter extends OncePerRequestFilter
 							java.util.List.of(
 									new SimpleGrantedAuthority("ROLE_"+user.getRole())));
 			
-			SecurityContextHolder.getContext().setAuthentication(authentication);
+			SecurityContext context = SecurityContextHolder.createEmptyContext();
+
+			context.setAuthentication(authentication);
+
+			SecurityContextHolder.setContext(context);
+			
 		}
-		catch(io.jsonwebtoken.JwtException | IllegalArgumentException ex)
-		{
-				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-				response.getWriter().write("Invalid or expired token");
-				return;
-		}
+			catch(io.jsonwebtoken.JwtException | IllegalArgumentException ex)
+			{
+			    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			    response.setContentType("application/json");
+			    response.getWriter().write(
+			            "{\"status\":401,\"message\":\"Invalid or expired token\"}"
+			    );
+			    return;
+			}
 	}
 		
 		filterChain.doFilter(request, response);

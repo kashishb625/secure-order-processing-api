@@ -28,5 +28,11 @@ public class GlobalExceptionHandler
 	{
 		return new ResponseEntity<>(ex.getMessage(),HttpStatus.UNAUTHORIZED);
 	}
+	
+	@ExceptionHandler(PasswordResetException.class)
+	public ResponseEntity<String> handlePassworedResetException(PasswordResetException ex)
+	{
+		return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+	}
 
 }

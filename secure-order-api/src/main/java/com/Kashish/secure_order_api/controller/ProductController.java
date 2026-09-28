@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 
+import com.Kashish.secure_order_api.dto.ApiResponse;
 import com.Kashish.secure_order_api.entity.Product;
 import com.Kashish.secure_order_api.service.ProductService;
 
@@ -35,71 +36,79 @@ public class ProductController
 	}
 	
 	@PostMapping
-	public Product createProduct(@Valid @RequestBody Product product)
+	public ApiResponse createProduct(@Valid @RequestBody Product product)
 	{
-		return productService.createProduct(product);
-		
+		Product savedproduct=productService.createProduct(product);
+		return new ApiResponse(200,"Product created successfully!!", savedproduct);
 	}
 	
 	@GetMapping
-	public Page<Product> getAllProducts(Pageable pageable)
+	public ApiResponse getAllProducts(Pageable pageable)
 	{
-		return productService.getProducts(pageable);
+		Page<Product> products=productService.getProducts(pageable);
+		return new ApiResponse(200,"Products Fetched Successfully!!",products);
 	}
 	
 	@GetMapping("/search")
-	public List<Product> searchProducts(@RequestParam String name)
+	public ApiResponse searchProducts(@RequestParam String name)
 	{
-		return productService.searchProductByName(name);
+		List<Product> products=productService.searchProductByName(name);
+		return new ApiResponse(200,"Products found successfully!!",products);
 	}
 	
 	@GetMapping("/search/price")
-	public List<Product> searchProductByPrice(@RequestParam("minPrice") Double minPrice,
+	public ApiResponse searchProductByPrice(@RequestParam("minPrice") Double minPrice,
 			@RequestParam("maxPrice") Double maxprice)
 	{
-		return productService.searchProductByPrice(minPrice, maxprice);
+		List<Product> products= productService.searchProductByPrice(minPrice, maxprice);
+		return new ApiResponse(200,"Products found successfully!!",products);
 	}
 	
 	@GetMapping("/search/filter")
-	public List<Product> searchProductByNameAndPrice(@RequestParam("name") String name,
+	public ApiResponse searchProductByNameAndPrice(@RequestParam("name") String name,
 			@RequestParam("minPrice") Double minPrice, @RequestParam("maxPrice")Double maxPrice )
 	{
-		return productService.searchProductsByNameAndPrice(name, minPrice, maxPrice);
+		List<Product> products=productService.searchProductsByNameAndPrice(name, minPrice, maxPrice);
+		return new ApiResponse(200,"Products found successfully!!",products);
 	}
 	
 	@GetMapping("/search/stock")
-	public List<Product> findbyStockRange(@RequestParam("minStock") Integer minStock,@RequestParam("maxStock") Integer maxStock)
+	public ApiResponse findbyStockRange(@RequestParam("minStock") Integer minStock,@RequestParam("maxStock") Integer maxStock)
 	{
-		return productService.searchProductByStockRange(minStock, maxStock);
+		List<Product> products= productService.searchProductByStockRange(minStock, maxStock);
+		return new ApiResponse(200,"Products found successfully!!",products);
 	}
 	
 	@GetMapping("/search/filter/all")
-	public List<Product> searchProductByNamePriceAndStock(@RequestParam("name") String name,
+	public ApiResponse searchProductByNamePriceAndStock(@RequestParam("name") String name,
 		        @RequestParam("minPrice") Double minPrice,
 		        @RequestParam("maxPrice") Double maxPrice,
 		        @RequestParam("minStock")Integer minStock,
 		        @RequestParam("maxStock")Integer maxStock)
 	{
-		return productService.searchProductByNamePriceAndStock(name, minPrice, maxPrice, minStock, maxStock);
+		List<Product> products= productService.searchProductByNamePriceAndStock(name, minPrice, maxPrice, minStock, maxStock);
+		return new ApiResponse(200,"Products found successfully!!",products);
 	}
 	
 	@GetMapping("/{id}")
-	public Product getProductById(@PathVariable Long id)
+	public ApiResponse getProductById(@PathVariable Long id)
 	{
-		return productService.getProductById(id);
+		Product product=productService.getProductById(id);
+		return new ApiResponse(200, "Product fetched successfully!!", product);
 	}
 	
 	@PutMapping("/{id}")
-	public Product updateProduct(@PathVariable Long id,@Valid @RequestBody Product product)
+	public ApiResponse updateProduct(@PathVariable Long id,@Valid @RequestBody Product product)
 	{
-		return productService.updateProduct(id, product);
+		Product updatedProduct=productService.updateProduct(id, product);
+		return new ApiResponse(200, "Product details updated successfully!!", updatedProduct);
 	}
 	
 	@DeleteMapping("/{id}")
-	public String deleteById(@PathVariable Long id)
+	public ApiResponse deleteById(@PathVariable Long id)
 	{
 		productService.deleteProduct(id);
-		return "Product deleted successfully";
+		return new ApiResponse(200,"Product deleted successfully",null);
 	}
 
 }

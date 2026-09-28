@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.Kashish.secure_order_api.dto.ApiResponse;
 import com.Kashish.secure_order_api.dto.OrderResponse;
 import com.Kashish.secure_order_api.entity.Order;
 import com.Kashish.secure_order_api.service.OrderService;
@@ -30,10 +31,11 @@ public class OrderController
 	}
 	
 	@PostMapping
-	public OrderResponse createOrder(@Valid @RequestBody Order order)
+	public ApiResponse createOrder(@Valid @RequestBody Order order)
 	{
 		Order createdOrder= orderService.createOrder(order);
-		return convertToResponse(createdOrder);
+		OrderResponse response=convertToResponse(createdOrder);
+		return new ApiResponse(201,"Order created Successfully!!",response);
 	}
 	
 	public OrderResponse convertToResponse(Order order)
@@ -60,31 +62,35 @@ public class OrderController
 	
 	
 	@GetMapping
-	public List<OrderResponse> getAllOrders()
+	public ApiResponse getAllOrders()
 	{
-		return orderService.getAllOrders().stream()
+		List<OrderResponse> responses= orderService.getAllOrders().stream()
 				.map(this::convertToResponse).toList();
+		
+		return new ApiResponse(200,"Orders fetched successfully!!",responses);
 	}
 	
 	@GetMapping("/{id}")
-	public OrderResponse getOrderbyId(@PathVariable Long id)
+	public ApiResponse getOrderbyId(@PathVariable Long id)
 	{
 		Order order= orderService.getOrderById(id);
-		return convertToResponse(order);
+		OrderResponse response=convertToResponse(order);
+		return new ApiResponse(200,"Order Fetched successfully!!",response);
 	}
 	
 	@PutMapping("/{id}")
-	public OrderResponse updateOrder(@PathVariable Long id,@Valid @RequestBody Order order)
+	public ApiResponse updateOrder(@PathVariable Long id,@Valid @RequestBody Order order)
 	{
 		Order updatedOrder=orderService.updateOrder(id, order);
-		return convertToResponse(updatedOrder);
+		OrderResponse response= convertToResponse(updatedOrder);
+		return new ApiResponse(200,"Order details updated successfully!!",response);
 	}
 	
 	@DeleteMapping("/{id}")
-	public String deleteOrder(@PathVariable Long id)
+	public ApiResponse deleteOrder(@PathVariable Long id)
 	{
 		orderService.deleteOrder(id);
-		return "Order Deleted Successfully!!";
+		return new ApiResponse(200, "Order Deleted Successfully!!",null);
 	}
 	
 }

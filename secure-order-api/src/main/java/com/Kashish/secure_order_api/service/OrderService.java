@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.Kashish.secure_order_api.audit.AuditLogService;
 import com.Kashish.secure_order_api.entity.Customer;
 import com.Kashish.secure_order_api.entity.Order;
 import com.Kashish.secure_order_api.exception.ResourceNotFoundException;
@@ -23,11 +24,13 @@ public class OrderService
 
 	private OrderRepository orderRepository;
 	private CustomerRepository customerRepository;
+	private final AuditLogService auditLogService;
 
-	public OrderService(OrderRepository orderRepository,CustomerRepository customerRepository)
+	public OrderService(OrderRepository orderRepository,CustomerRepository customerRepository,AuditLogService auditLogService)
 	{
 		this.customerRepository= customerRepository;
 		this.orderRepository = orderRepository;
+		this.auditLogService=auditLogService;
 	}
 	
 	public Order createOrder(Order order)
@@ -47,7 +50,9 @@ public class OrderService
 		}
 		
 		order.setOrderDate(LocalDateTime.now());
-		return orderRepository.save(order);
+		Order savedOrder= orderRepository.save(order);
+		auditLogService.log(authentication.getName(),"CREATE_ORDER");
+		return savedOrder;
 	}
 	
 	public List<Order> getAllOrders()
@@ -143,7 +148,9 @@ public class OrderService
 		existingOrder.setTotalAmount(updatedOrder.getTotalAmount());
 		existingOrder.setStatus(updatedOrder.getStatus());
 		
-		return orderRepository.save(existingOrder);
+		Order savedOrder=orderRepository.save(existingOrder);
+		auditLogService.log(authentication.getName(), "UPDATE_ORDER");
+		return savedOrder;
 	}
 	
 	
@@ -177,6 +184,7 @@ public class OrderService
 		}
 		
 		orderRepository.delete(order);
+		auditLogService.log(authentication.getName(), "DELETE_ORDER");
 		
 	}
 	

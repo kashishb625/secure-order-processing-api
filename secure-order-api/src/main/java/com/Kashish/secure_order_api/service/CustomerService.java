@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.Kashish.secure_order_api.audit.AuditLogService;
 import com.Kashish.secure_order_api.entity.Customer;
 import com.Kashish.secure_order_api.entity.User;
 import com.Kashish.secure_order_api.exception.ResourceNotFoundException;
@@ -18,11 +19,14 @@ public class CustomerService
 {
 	private final CustomerRepository customerRepository;
 	private final UserService userService;
+	private final AuditLogService auditLogService;
 
-	public CustomerService(CustomerRepository customerRepository,UserService userService) 
+	public CustomerService(CustomerRepository customerRepository,UserService userService,
+			AuditLogService auditLogService) 
 	{
 		this.customerRepository = customerRepository;
 		this.userService=userService;
+		this.auditLogService=auditLogService;
 	}
 	
 	public Customer createCustomer(Customer customer)
@@ -32,7 +36,9 @@ public class CustomerService
 		User user=userService.getUserByUsername(username);
 		customer.setUser(user);
 		
-		return customerRepository.save(customer);
+		Customer savedCustomer= customerRepository.save(customer);
+		auditLogService.log(username,"CREATE_CUSTOMER");
+		return savedCustomer;
 	}
 	
 	public List<Customer> getAllCustomers()
@@ -99,7 +105,9 @@ public class CustomerService
 		existingCustomer.setEmail(updatedCustomer.getEmail());
 		existingCustomer.setPhone(updatedCustomer.getPhone());
 		
-		return customerRepository.save(existingCustomer);
+		Customer savedCustomer= customerRepository.save(existingCustomer);
+		auditLogService.log(authentication.getName(),"UPDATE_CUSTOMER");
+		return savedCustomer;
 	}
 	
 	public void deleteCustomer(Long id)
@@ -130,6 +138,7 @@ public class CustomerService
 		}
 		
 		customerRepository.delete(customer);
+		auditLogService.log(authentication.getName(), "DELETE_CUSTOMER");
 	}
 
 }

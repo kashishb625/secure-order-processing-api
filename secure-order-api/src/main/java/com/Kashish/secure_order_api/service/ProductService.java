@@ -1,11 +1,13 @@
 package com.Kashish.secure_order_api.service;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.data.domain.Page;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.Kashish.secure_order_api.audit.AuditLogService;
 import com.Kashish.secure_order_api.entity.Product;
 import com.Kashish.secure_order_api.exception.ResourceNotFoundException;
 import com.Kashish.secure_order_api.repository.ProductRepository;
@@ -15,16 +17,19 @@ public class ProductService
 {
 
 	private final ProductRepository productRepository;
+	private final AuditLogService auditLogService;
 
-	public ProductService(ProductRepository productRepository) 
+	public ProductService(ProductRepository productRepository,AuditLogService auditLogService) 
 	{
 			this.productRepository = productRepository;
+			this.auditLogService=auditLogService;
 	}
 	
 	public Product createProduct(Product product)
 	{
-		return productRepository.save(product);
-		
+	    Product savedProduct = productRepository.save(product);
+	    auditLogService.log(getUsername(), "CREATE_PRODUCT");
+	    return savedProduct;
 	}
 	
 	public List<Product>getAllProducts()
@@ -76,12 +81,21 @@ public class ProductService
 		existingProduct.setPrice(updatedProduct.getPrice());
 		existingProduct.setStock_Quantity(updatedProduct.getStock_Quantity());
 		
-		return productRepository.save(existingProduct);
+		Product savedProduct= productRepository.save(existingProduct);
+		auditLogService.log(getUsername(), "UPDATE_PRODUCT");
+		return savedProduct;
+		
 	}
 	
 	public void deleteProduct(Long id)
 	{
 		Product product=productRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Product not found with id: "+id));
 		productRepository.delete(product);
+		auditLogService.log(getUsername(), "DELETE_PRODUCT");
+	}
+	
+	public String getUsername()
+	{
+		return SecurityContextHolder.getContext().getAuthentication().getName();
 	}
 }

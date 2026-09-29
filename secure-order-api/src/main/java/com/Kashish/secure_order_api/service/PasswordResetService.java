@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.Kashish.secure_order_api.audit.AuditLogService;
 import com.Kashish.secure_order_api.entity.PasswordResetToken;
 import com.Kashish.secure_order_api.entity.User;
 import com.Kashish.secure_order_api.exception.PasswordResetException;
@@ -20,12 +21,15 @@ public class PasswordResetService
 	private final PasswordResetTokenRepository passwordResetTokenRepository;
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final AuditLogService auditLogService;
 	
-	public PasswordResetService(PasswordResetTokenRepository passwordResetTokenRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) 
+	public PasswordResetService(PasswordResetTokenRepository passwordResetTokenRepository, UserRepository userRepository, 
+			PasswordEncoder passwordEncoder,AuditLogService auditLogService) 
 	{		
 		this.passwordResetTokenRepository = passwordResetTokenRepository;
 		this.userRepository = userRepository;
 		this.passwordEncoder=passwordEncoder;
+		this.auditLogService=auditLogService;
 	}
 	
 	public String generateResetToken(String username)
@@ -52,6 +56,7 @@ public class PasswordResetService
 		resetToken.setUser(user);
 		
 		passwordResetTokenRepository.save(resetToken);
+		auditLogService.log(user.getUsername(),"PASSWORD_RESET_REQUESTED");
 		return token;
 	}
 	
@@ -76,7 +81,7 @@ public class PasswordResetService
 		user.setPassword(encodedPassword);
 		
 		userRepository.save(user);
-		
+		auditLogService.log(user.getUsername(),"PASSWORD_RESET");
 		passwordResetTokenRepository.delete(resetToken);
 	}
 	

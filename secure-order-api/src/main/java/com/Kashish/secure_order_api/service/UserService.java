@@ -9,6 +9,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.Kashish.secure_order_api.audit.AuditLog;
+import com.Kashish.secure_order_api.audit.AuditLogService;
 import com.Kashish.secure_order_api.dto.UserUpdateRequest;
 import com.Kashish.secure_order_api.entity.User;
 import com.Kashish.secure_order_api.exception.ResourceNotFoundException;
@@ -19,18 +21,22 @@ public class UserService
 {
 	private final UserRepository userRepository;
 	private PasswordEncoder passwordEncoder;
+	private AuditLogService auditLogService;
 
-	public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder) 
+	public UserService(UserRepository userRepository,PasswordEncoder passwordEncoder,AuditLogService auditLogService) 
 	{
 		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
+		this.auditLogService=auditLogService;
 	}
 	
 	public User createUser(User user)
 	{
 		String encodedPassword=passwordEncoder.encode(user.getPassword());
 		user.setPassword(encodedPassword);
-		return userRepository.save(user);
+		User savedUser= userRepository.save(user);
+		auditLogService.log(user.getUsername(),"CREATE_USER");
+		return savedUser;
 	}
 	
 	public List<User> getAllUsers()
@@ -72,7 +78,9 @@ public class UserService
 		String encodedPassword=passwordEncoder.encode(request.getPassword());
 		user.setPassword(encodedPassword);
 		
-		return userRepository.save(user);
+		User savedUser= userRepository.save(user);
+		auditLogService.log(user.getUsername(),"CHANGE_PASSWORD");
+		return savedUser;
 	}
 	
 	public void deleteUser(Long id)

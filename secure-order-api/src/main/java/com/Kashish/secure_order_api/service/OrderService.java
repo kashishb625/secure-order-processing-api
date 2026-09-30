@@ -18,6 +18,8 @@ import com.Kashish.secure_order_api.exception.ResourceNotFoundException;
 import com.Kashish.secure_order_api.repository.CustomerRepository;
 import com.Kashish.secure_order_api.repository.OrderRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class OrderService
 {
@@ -33,6 +35,7 @@ public class OrderService
 		this.auditLogService=auditLogService;
 	}
 	
+	@Transactional
 	public Order createOrder(Order order)
 	{
 		
@@ -115,7 +118,7 @@ public class OrderService
 	    return order;
 	}
 	
-	
+	@Transactional
 	public Order updateOrder(Long id,Order updatedOrder)
 	{
 		Order existingOrder=orderRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Order not found with id: "+id));;
@@ -153,7 +156,7 @@ public class OrderService
 		return savedOrder;
 	}
 	
-	
+	@Transactional
 	public void deleteOrder(Long id)
 	{
 		Order order=orderRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Order not found with id: "+id));

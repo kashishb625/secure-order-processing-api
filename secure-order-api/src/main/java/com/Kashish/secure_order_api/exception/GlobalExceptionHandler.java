@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.Kashish.secure_order_api.dto.ApiResponse;
 
@@ -35,6 +36,19 @@ public class GlobalExceptionHandler
 	public ResponseEntity<ApiResponse> handlePassworedResetException(PasswordResetException ex)
 	{
 		return new ResponseEntity<>(new ApiResponse(400,ex.getMessage(),null),HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(ResponseStatusException.class)
+	public ResponseEntity<ApiResponse> handleResponseStatusException(ResponseStatusException ex)
+	{
+	    return new ResponseEntity<>(
+	            new ApiResponse(
+	                    ex.getStatusCode().value(),
+	                    ex.getReason(),
+	                    null
+	            ),
+	            ex.getStatusCode()
+	    );
 	}
 
 }

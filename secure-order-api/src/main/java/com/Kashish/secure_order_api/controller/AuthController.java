@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.Kashish.secure_order_api.dto.ForgotPasswordRequest;
 import com.Kashish.secure_order_api.dto.LoginRequest;
 import com.Kashish.secure_order_api.dto.LoginResponse;
 import com.Kashish.secure_order_api.dto.ResetPasswordRequest;
@@ -33,9 +34,9 @@ public class AuthController
 	}
 	
 	@PostMapping("/forgot-password")
-	public String forgotPassword(@RequestBody String username)
+	public String forgotPassword(@RequestBody ForgotPasswordRequest request)
 	{
-		return passwordResetService.generateResetToken(username);
+		return passwordResetService.generateResetToken(request.getUsername());
 	}
 	
 	@PostMapping("/reset-password")

@@ -33,11 +33,50 @@ The application provides backend functionality for:
 - Password management and recovery
 - Audit logging
 - Transaction management
+- Product inventory and stock handling
 - DTO-based API responses
 - Swagger/OpenAPI documentation
 - Automated testing
 
 The project was developed with a focus on security, data integrity, validation, maintainability, and reproducibility.
+
+### 1.1 Target Stakeholder
+
+The primary stakeholder is a backend project reviewer, mentor, or organization evaluating a secure order-processing system. The API supports users and administrators who need reliable management of customers, products, orders, inventory, and authentication.
+
+### 1.2 Scope and Boundaries
+
+#### In Scope
+- User registration and JWT authentication
+- Role-based authorization and user-specific resource authorization
+- Customer, product, and order management
+- Product inventory and stock deduction during order creation
+- Input validation and structured error handling
+- Password management and recovery
+- Audit logging and transaction management
+- Automated service-layer testing
+- Swagger/OpenAPI API documentation
+
+#### Out of Scope
+- Frontend/web UI development
+- Payment gateway integration
+- Real-time notifications
+- Distributed/microservice architecture
+- Cloud deployment and production infrastructure
+- Advanced warehouse-management functionality
+
+### 1.3 Success Metrics
+
+The project is considered successful when:
+1. Core REST endpoints work correctly for valid requests.
+2. Unauthorized access and unauthorized-resource attempts are rejected.
+3. Invalid input produces structured error responses.
+4. Order creation validates product availability and deducts stock correctly.
+5. Failed orders do not incorrectly modify inventory.
+6. Passwords and sensitive configuration values are protected.
+7. Important user and business actions are recorded through audit logs.
+8. Automated tests and Postman/Swagger validation provide repeatable evidence.
+9. The project can be reproduced and evaluated from the version-controlled repository and documentation.
 
 ---
 
@@ -57,6 +96,7 @@ The project was developed with a focus on security, data integrity, validation, 
 | Password Recovery | Time-limited UUID-based password reset token | `07-password-recovery.png` |
 | Audit Logging | Audit events stored in `audit_logs` table | Application implementation |
 | Transaction Management | `@Transactional` used for important order operations | Application implementation |
+| Inventory Management | Product stock is checked before order creation and deducted after a successful order | Postman / database validation |
 | Product Search | Search by product name | `08-product-search.png` |
 | Product Filtering | Filtering by price, stock, name and combined conditions | `08-product-search.png` |
 | Pagination | Spring Data `Pageable` implementation | `09-pagination-sorting(1).png`, `09-pagination-sorting-response.png` |
@@ -257,6 +297,7 @@ The application handles exceptions including:
 - `InvalidCredentialsException`
 - `PasswordResetException`
 - `ResponseStatusException`
+- `IllegalArgumentException` (for invalid business conditions such as insufficient stock)
 
 The application returns standardized API responses instead of exposing inconsistent default error responses.
 
@@ -417,6 +458,26 @@ Transactional behavior is applied to important order operations such as:
 - Order deletion
 
 This helps maintain database consistency when multiple operations are performed as part of a business operation.
+
+### 16.1 Inventory Handling During Order Creation
+
+Order creation includes product stock validation and deduction.
+
+The flow is:
+1. The requested product is identified from the order.
+2. The available stock is checked against the requested quantity.
+3. If sufficient stock is unavailable, the order is rejected with HTTP `400 Bad Request`.
+4. If sufficient stock is available, the requested quantity is deducted from the product stock.
+5. Order creation and stock deduction are handled within the same transaction.
+
+This prevents orders from being created when the requested inventory is unavailable and ensures that a rejected order does not reduce stock.
+
+### Validation Evidence
+
+The inventory flow was manually tested using Postman and MySQL:
+- Successful order creation reduced product stock by the requested quantity.
+- An order requesting more stock than available was rejected.
+- Stock remained unchanged after the rejected order.
 
 ---
 
@@ -805,6 +866,16 @@ The source code is maintained in the GitHub repository:
 
     https://github.com/kashishb625/secure-order-processing-api
 
+ ### 27.1 Key Design Decisions and Trade-offs
+
+- **Spring Boot layered architecture:** Controllers, services, repositories, security, DTOs, and exception handling are separated to keep responsibilities clear and maintainable.
+- **JWT authentication:** Chosen for stateless authentication in the REST API.
+- **Role and ownership authorization:** ADMIN users can access administrative resources, while USER access is restricted to permitted resources.
+- **MySQL with JPA/Hibernate:** Used for relational persistence and entity relationships.
+- **Transactional order processing:** Order creation and inventory deduction are performed within a transaction to maintain consistency.
+- **Audit logging:** Important security and business actions are recorded for traceability.
+- **Local development database:** A local MySQL environment is used because the project focuses on backend implementation and evaluation rather than production deployment.
+
 ---
 
 # 28. Reproducibility
@@ -833,6 +904,9 @@ Postman was used to verify:
 - Authentication
 - Authorization
 - CRUD operations
+- Inventory stock validation
+- Insufficient stock handling
+- Stock deduction during order creation
 - Validation
 - Error handling
 - Password recovery
@@ -872,6 +946,7 @@ The Secure Order API has been:
 - Extended with password management and recovery
 - Extended with audit logging
 - Extended with transaction management
+- Extended with product inventory and stock handling during order creation
 - Extended with product search and filtering
 - Extended with pagination and sorting
 - Documented using Swagger/OpenAPI
@@ -880,6 +955,26 @@ The Secure Order API has been:
 - Validated through manual API testing and evidence screenshots
 
 **Project Status: Completed**
+
+### 30.1 Limitations
+
+- The project is intended for local development and evaluation rather than production deployment.
+- Payment processing is not implemented.
+- No frontend interface is included.
+- Inventory management is limited to product stock tracking and deduction during order creation.
+- Automated testing currently focuses primarily on service-layer functionality; a larger integration and security test suite could provide additional coverage.
+- Production-grade monitoring, centralized logging, rate limiting, and deployment infrastructure are not included.
+
+### 30.2 Future Improvements
+
+Potential next improvements include:
+- Payment gateway integration.
+- Advanced inventory and warehouse management.
+- Expanded integration and security testing.
+- Rate limiting and additional API security controls.
+- Centralized monitoring and application logging.
+- Docker-based deployment and CI/CD automation.
+- Production-readiness improvements for scalability, maintainability, and security.
 
 ---
 
@@ -898,6 +993,7 @@ The major technical highlights of the project include:
 - Password recovery using time-limited reset tokens
 - Audit logging
 - Transaction management
+- Product inventory and stock management
 - Product search and filtering
 - Pagination and sorting
 - Swagger/OpenAPI documentation
@@ -936,7 +1032,7 @@ These files provide visual evidence for the major implemented requirements.
 
 **Kashish Bhatnagar**
 
-Java Backend Developer | Spring Boot | REST APIs | MySQL
+Java Backend Developer
 
 GitHub:
 

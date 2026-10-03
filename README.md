@@ -66,6 +66,10 @@ The project focuses on building a structured and secure backend application with
 - Price range filtering
 - Stock-based filtering
 - Combined product filtering
+- Inventory stock management
+- Stock validation during order creation
+- Automatic stock deduction based on order quantity
+- Insufficient stock handling
 
 ### 🛒 Order Management
 
@@ -76,6 +80,10 @@ The project focuses on building a structured and secure backend application with
 - Delete order
 - Automatic order date/time
 - Customer-order relationship
+- Product-order relationship
+- Order quantity management
+- Inventory validation during order creation
+- Automatic inventory stock deduction
 - User-specific order access
 - Admin access to order resources
 - Transaction management for order operations
@@ -313,11 +321,15 @@ Customer
  │ One-to-Many
  ▼
 Order
+ │
+ │ Many-to-One
+ ▼
+Product
 ```
 
 A user can have an associated customer, while a customer can have multiple orders.
 
-Orders are associated with customers using JPA relationships.
+Each order is associated with a customer and a product using JPA relationships.
 
 ---
 
@@ -534,7 +546,7 @@ Transaction management is implemented using Spring's `@Transactional` annotation
 
 The following operations are transactional:
 
-- Order creation
+- Order creation and inventory stock deduction
 - Order update
 - Order deletion
 
@@ -727,6 +739,7 @@ Sensitive database credentials and JWT secrets should not be committed to source
 - Product CRUD APIs
 - Order CRUD APIs
 - JPA/Hibernate relationships
+- Inventory and stock management
 - Request validation
 - Global exception handling
 - Resource-not-found handling
@@ -780,6 +793,7 @@ This project demonstrates practical backend development concepts including:
 - Automated unit testing
 - Mockito
 - Postman API testing
+- Inventory and stock management
 - Git/GitHub workflow
 
 ---
@@ -788,4 +802,4 @@ This project demonstrates practical backend development concepts including:
 
 **Kashish Bhatnagar**
 
-Java Backend Developer | Spring Boot | REST APIs | MySQL
+Java Backend Developer

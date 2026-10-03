@@ -23,6 +23,14 @@ public class Order
 	@ManyToOne
 	@JoinColumn(name="customer_id",nullable=false)
 	private Customer customer;
+	
+	@ManyToOne
+	@JoinColumn(name="product_id", nullable=false)
+	private Product product;
+
+	@Min(value=1, message="Quantity must be at least 1.")
+	private int quantity;
+	
 	@Min(value=0,message="Total Amount cannot be negative.")
 	private double totalAmount;
 	@NotBlank(message="Order status is required.")
@@ -47,6 +55,21 @@ public class Order
 		this.customer = customer;
 	}
 
+	public Product getProduct() {
+		return product;
+	}
+
+	public void setProduct(Product product) {
+		this.product = product;
+	}
+
+	public int getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
 	
 	public double getTotalAmount() {
 		return totalAmount;
@@ -75,6 +98,7 @@ public class Order
 	{
 		this.orderDate = orderDate;
 	}
+
 	
 	
 

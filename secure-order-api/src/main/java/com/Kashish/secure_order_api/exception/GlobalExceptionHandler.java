@@ -1,5 +1,8 @@
 package com.Kashish.secure_order_api.exception;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
@@ -49,6 +52,17 @@ public class GlobalExceptionHandler
 	            ),
 	            ex.getStatusCode()
 	    );
+	}
+	
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(
+	        IllegalArgumentException ex) {
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("status", 400);
+	    response.put("message", ex.getMessage());
+
+	    return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 
 }

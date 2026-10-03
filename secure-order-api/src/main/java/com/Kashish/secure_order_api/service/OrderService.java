@@ -14,9 +14,11 @@ import org.springframework.web.server.ResponseStatusException;
 import com.Kashish.secure_order_api.audit.AuditLogService;
 import com.Kashish.secure_order_api.entity.Customer;
 import com.Kashish.secure_order_api.entity.Order;
+import com.Kashish.secure_order_api.entity.Product;
 import com.Kashish.secure_order_api.exception.ResourceNotFoundException;
 import com.Kashish.secure_order_api.repository.CustomerRepository;
 import com.Kashish.secure_order_api.repository.OrderRepository;
+import com.Kashish.secure_order_api.repository.ProductRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -24,15 +26,18 @@ import jakarta.transaction.Transactional;
 public class OrderService
 {
 
-	private OrderRepository orderRepository;
-	private CustomerRepository customerRepository;
+	private final OrderRepository orderRepository;
+	private final CustomerRepository customerRepository;
 	private final AuditLogService auditLogService;
+	private final ProductRepository productRepository;
 
-	public OrderService(OrderRepository orderRepository,CustomerRepository customerRepository,AuditLogService auditLogService)
+	public OrderService(OrderRepository orderRepository,CustomerRepository customerRepository,
+			AuditLogService auditLogService,ProductRepository productRepository)
 	{
 		this.customerRepository= customerRepository;
 		this.orderRepository = orderRepository;
 		this.auditLogService=auditLogService;
+		this.productRepository=productRepository;
 	}
 	
 	@Transactional
@@ -40,17 +45,31 @@ public class OrderService
 	{
 		
 		Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+		
 		boolean isAdmin=authentication.getAuthorities()
 				.stream().anyMatch(authority->
 				authority.getAuthority().equals("ROLE_ADMIN"));
 		
-		if(!isAdmin) {
+		if(!isAdmin) 
+		{
 			String username=authentication.getName();
 			Customer customer=customerRepository.findByUserUsername(username)
 					.orElseThrow(()->new ResourceNotFoundException("Customer profile not found for user: "+username));
 			
 			order.setCustomer(customer);
 		}
+		
+		Product product = productRepository.findById(order.getProduct().getId())
+		        .orElseThrow(() -> new ResourceNotFoundException(
+		                "Product not found with id: " + order.getProduct().getId()));
+		
+		if (product.getStock_Quantity() < order.getQuantity()) 
+		{
+		    throw new IllegalArgumentException("Insufficient stock for this product");
+		}
+		product.setStock_Quantity(product.getStock_Quantity() - order.getQuantity());
+
+		productRepository.save(product);
 		
 		order.setOrderDate(LocalDateTime.now());
 		Order savedOrder= orderRepository.save(order);
